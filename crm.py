@@ -19,15 +19,20 @@ cursor = connection.cursor()
 # View all entries
 ## Portal = DB type (Company / Employee)
 def view(portal):
-  print("View " + portal)
   results = ""
   if portal == "company":
     results = cursor.execute("SELECT * FROM companies")
+    print("\n\n")
+    print(results.fetchall())
+    companiesPortal()
 
   elif portal == "employee":
     results = cursor.execute("SELECT * FROM employees")
-  
-  print(results.fetchone())
+    print("\n\n")
+    print(results.fetchall())
+    employeesPortal()
+
+
 
 # View specified entry
 ## Search by: ID or Name
@@ -39,7 +44,106 @@ def show(portal):
 # Create a new entry
 ## Portal = DB type (Company / Employee)
 def create(portal):
-  print("Create " + portal)
+  if portal == "company":
+    print("Creating a new company.")
+    print("Please insert the company's name:")
+    name = input("> ")
+    cursor.execute(
+      "INSERT INTO companies (name) VALUES (?)",
+      [name]
+    )
+    connection.commit()
+
+  if portal == "employee":
+    print("Creating a new employee.")
+    print("Please insert the employee's full name:")
+    name = input("> ")
+
+    def employerFinder():
+      print("Where does the employee work?")
+      print("Please choose one of the following:")
+      print("1. Search for Existing Companies")
+      print("2. Create a new Company")
+      selection = input("> ")
+
+      if selection == "1" or selection == "search" or selection == "Search":
+        def employerSearch():
+          print("Input the company's name:")
+          searchName = input("> ")
+          searchResults = cursor.execute(
+            "SELECT * FROM companies WHERE name = ?",
+            [searchName]
+          )
+          allResults = searchResults.fetchall()
+          if len(allResults) == 0:
+            print("Could not find " + searchName + ".")
+            print("Please try again.")
+            employerSearch()
+
+          elif len(allResults) == 1:
+            print("The following company was found:")
+            print(allResults)
+            print("Is this the correct company?")
+            print("1. Yes")
+            print("2. No")
+            selection = input("> ")
+            if selection == "1":
+              return allResults[0]
+            else:
+              employerSearch()
+            
+          else:
+            def multiCompanySelection():
+              print("The following companies were found:")
+              for index, result in range(len(searchResults)):
+                print(f"{index+1}.")
+                print(searchResults[result])
+              print(f"{len(searchResults)+2}. None of the above")
+
+              selection = input("> ")
+              if int(selection) > 0 and int(selection) <= len(searchResults)+1:
+                return searchResults[int(selection)]
+
+              elif int(selection) == len(searchResults)+2:
+                employerSearch()
+
+              else:
+                multiCompanySelection()
+            
+            acceptedCompany = multiCompanySelection()
+            if acceptedCompany:
+              return acceptedCompany
+
+        company = employerSearch()  
+        return company
+        
+      if selection == "2" or selection == "create" or selection == "Create":
+        def createCompany():
+          print("Creating a new Company.")
+          print("Insert the Company's Name:")
+          companyName = input("> ")
+          if companyName:
+            cursor.execute(
+              "INSERT INTO companies (name) VALUES (?) RETURNING id, name",
+              [companyName]
+              )
+            newCompany = cursor.fetchone()
+            connection.commit()
+            return newCompany
+          else:
+            createCompany()
+        createdCompany = createCompany()
+        return createdCompany
+
+
+
+    company = employerFinder()[0]
+    print(company)
+    cursor.execute(
+      "INSERT INTO employees (name, company_id) VALUES (?,?)",
+      [name, company]
+    )
+    connection.commit()
 
 
 # Update specified entry
@@ -123,6 +227,7 @@ def root():
   print("Select the portal you would like to enter:")
   print("1. Companies")
   print("2. Employees")
+  print("9. Shut Down")
 
   selection = input("> ")
   if selection == "1" or selection == "Companies" or selection == "companies":
@@ -130,6 +235,10 @@ def root():
 
   elif selection == "2" or selection == "Employees" or selection == "employees":
     employeesPortal()
+
+  elif selection == "9" or selection == "close" or selection == "Close" or selection == "shut down" or selection == "Shut down" or selection == "Shut Down":
+    # All actions completes.
+    print("Shutting Down.")
 
   else:
     print("Invalid Selection. Please try again.")
@@ -140,10 +249,7 @@ def root():
 # Initial Load 
 root()
 
-
-# All actions completes.
-print("Shutting Down.")
-
+# Shut down requested.
 ## Killing connection
 connection.close()
 print("Connection Closed")
