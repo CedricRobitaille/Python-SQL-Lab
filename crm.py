@@ -25,7 +25,6 @@ cursor = connection.cursor()
 # View all entries
 ## Portal = DB type (Company / Employee)
 def view(portal):
-  results = ""
   if portal == "company":
     results = cursor.execute("SELECT * FROM companies")
     print("\n\n")
@@ -221,34 +220,48 @@ def create(portal):
     employeesPortal()
 
 
+
 # Update specified entry
 ## Search by: ID
 ## Portal = DB type (Company / Employee)
 def update(portal):
+  # Within the company portal
   if portal == "company":
+    # Function to allow the user to select a company that they would like to edit
     def companySelection():
       print("\n\n\nInput the Company ID for the company you would like to update:")
       company_id = input("> ")
 
+      # Search for companies with the ID found.
       results = cursor.execute(
         "SELECT * FROM companies WHERE id = ?",
         [company_id]
       )
       company = results.fetchone()
+      
+      # Let the user confirm their selection.
       print("\nWould you like to edit:")
       print(company)
       print("1. Yes")
       print("2. No")
       selection = input("> ")
+      # The user confirmed their selection...
+      ## Return the company tuple to be used in selecting the company to edit.
       if selection == "1" or selection == "Yes" or selection == "yes":
         return company
+      ## Invalid selection / "no", so let the user search for a new company
       else:
         return companySelection()
 
+    # Start by getting the company the user would like to edit
+    ## A Tuple gets returned with the company's information (ID, name)
     company = companySelection()[0]
+
+    # User inputs a new company name
     print("\nInput a new Company Name:")
     name = input("> ")
 
+    # Once the name and companyID is selected, update accordingly.
     cursor.execute(
       "UPDATE companies SET name = ? WHERE id = ?",
       [name, company]
@@ -256,34 +269,46 @@ def update(portal):
     connection.commit()
     companiesPortal()
     
-  
+  # Within the employee portal
   if portal == "employee":
+    # Function to allow the user to select a employee that they would like to edit
     def employeeSelection():
       print("\n\n\nInput the Employee ID for the Employee you would like to update:")
       employee_id = input("> ")
 
+       # Search for employees with the ID found.
       results = cursor.execute(
         "SELECT * FROM employees WHERE id = ?",
         [employee_id]
       )
       employee = results.fetchone()
+
+      # Let the user confirm their selection.
       print("\nWould you like to edit:")
       print(employee)
       print("1. Yes")
       print("2. No")
       selection = input("> ")
+      # The user confirmed their selection...
+      ## Return the employee tuple to be used in selecting the employee to edit.
       if selection == "1" or selection == "Yes" or selection == "yes":
         return employee
       else:
         return employeeSelection()
 
+    # Start by getting the employee the user would like to edit
+    ## A Tuple gets returned with the company's information (ID, name)
     employee = employeeSelection()[0]
+
+    # User inputs a new Employee Name
     print("\nInput a new Employee Name:")
     name = input("> ")
 
+    # User inputs a new Employee's Company ID
     print("\nInput a new Company ID:")
     company_id = input("> ")
 
+    # Once the Employee, new name and companyID is selected, update accordingly.
     cursor.execute(
       "UPDATE employees SET name = ?, company_id = ? WHERE id = ?",
       [name, company_id, employee]
@@ -297,10 +322,12 @@ def update(portal):
 ## Delete by: ID
 ## Portal = DB type (Company / Employee)
 def delete(portal):
+  # Within the company Portal
   if portal == "company":
     print("\n\n\nEnter the Company's ID")
     company_id = input("> ")
 
+    # User inputs the company id, and deletes based on the ID
     result = cursor.execute(
       "DELETE FROM companies WHERE id = ?", 
       [company_id]
@@ -309,10 +336,12 @@ def delete(portal):
     print("Deleted Company")
     companiesPortal()
 
+  # Within the employee Portal
   if portal == "employee":
     print("\n\n\nEnter the Employee's ID")
     employee_id = input("> ")
 
+    # User inputs the employee id, and deletes based on the ID
     result = cursor.execute(
       "DELETE FROM employees WHERE id = ?",
       [employee_id]
