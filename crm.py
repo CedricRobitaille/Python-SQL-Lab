@@ -20,7 +20,14 @@ cursor = connection.cursor()
 ## Portal = DB type (Company / Employee)
 def view(portal):
   print("View " + portal)
+  results = ""
+  if portal == "company":
+    results = cursor.execute("SELECT * FROM companies")
 
+  elif portal == "employee":
+    results = cursor.execute("SELECT * FROM employees")
+  
+  print(results.fetchone())
 
 # View specified entry
 ## Search by: ID or Name
@@ -82,7 +89,7 @@ def companiesPortal():
 
 # Employee Portal to decide on actions for the employee DB
 def employeesPortal():
-  print("\n\n\Employees Portal")
+  print("\n\n\nEmployees Portal")
   print("Select an action to perform:")
   print("1. View all Employees")
   print("2. Show an Employee")
