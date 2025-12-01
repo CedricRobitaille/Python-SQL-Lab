@@ -82,7 +82,31 @@ def companiesPortal():
 
 # Employee Portal to decide on actions for the employee DB
 def employeesPortal():
-  print("\n\n\nEmployees Portal")
+  print("\n\n\Employees Portal")
+  print("Select an action to perform:")
+  print("1. View all Employees")
+  print("2. Show an Employee")
+  print("3. Create a Employee")
+  print("4. Update a Employee")
+  print("5. Delete a Employee")
+  print("6. Back to Home Portal")
+
+  selection = input("> ")
+  if (selection == "1" or selection == "view"):
+    view("employee")
+  elif (selection == "2" or selection == "show"):
+    show("employee")
+  elif (selection == "3" or selection == "create"):
+    create("employee")
+  elif (selection == "4" or selection == "update"):
+    update("employee")
+  elif (selection == "5" or selection == "delete"):
+    delete("employee")
+  elif (selection == "6" or selection == "back"):
+    root()
+  else:
+    print("Invalid Selection. Please try again.")
+    employeesPortal()
 
 
 
