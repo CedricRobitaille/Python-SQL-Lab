@@ -5,6 +5,7 @@
 import sqlite3
 connection = sqlite3.connect("crm_db.db")
 print("Connected!")
+
 cursor = connection.cursor()
 ## Create Tables into the SQLite CRM-DB
 # cursor.execute(
@@ -15,19 +16,48 @@ cursor = connection.cursor()
 # )
 
 
-print("Welcome to your Customer Relationship Management Tool.")
-
+# Employee Portal to decide on actions for the Company DB
 def companiesPortal():
   print("\n\n\nCompanies Portal")
+  print("Select an action to perform:")
+  print("1. View all Companies")
+  print("2. Show a Company")
+  print("3. Create a Company")
+  print("4. Update a Company")
+  print("5. Delete a Company")
+  print("6. Back to Home Portal")
 
+  selection = input("> ")
+  if (selection == "1" or selection == "view"):
+    print("View")
+  elif (selection == "2" or selection == "show"):
+    print("Show")
+  elif (selection == "3" or selection == "create"):
+    print("Create")
+  elif (selection == "4" or selection == "update"):
+    print("Update")
+  elif (selection == "5" or selection == "delete"):
+    print("Delete")
+  elif (selection == "6" or selection == "back"):
+    print("View")
+    root()
+  else:
+    print("Invalid Selection. Please try again.")
+    companiesPortal()
+
+
+# Employee Portal to decide on actions for the employee DB
 def employeesPortal():
   print("\n\n\nEmployees Portal")
 
+
+# Root Portal to decide between actions.
 def root():
+  print("\n\n\nWelcome to your Customer Relationship Management Tool.")
   print("Select the portal you would like to enter:")
   print("1. Companies\n2. Employees")
-  selection = input("> ")
 
+  selection = input("> ")
   if selection == "1" or selection == "Companies" or selection == "companies":
     companiesPortal()
 
@@ -39,9 +69,18 @@ def root():
     root()
 
 
+
+
+
+
+# Initial Load 
 root()
 
-print("Finished All Actions")
 
+
+# All actions completes.
+print("Shutting Down.")
+
+## Killing connection
 connection.close()
 print("Connection Closed")
