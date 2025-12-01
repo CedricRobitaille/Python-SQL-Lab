@@ -2,6 +2,12 @@
 # # the user should be able to create, read, update, and delete both companies and employees
 # # relate employees to companies, so companies can have many employees and each employee has one employer
 
+#! Highlighted Functionality:
+#! Within the `create` function on line 73...
+#! When creating a new employee, I created a system to allow the user to search / create a company.
+#! The search functionality allows the user to search for a company name, to which the app returns all companies with that name.
+#! If the correct company was found, then the user can select the company, and it will add the company's ID to that new user's entry.
+
 import sqlite3
 connection = sqlite3.connect("crm_db.db")
 print("Connected!")
@@ -38,7 +44,28 @@ def view(portal):
 ## Search by: ID or Name
 ## Portal = DB type (Company / Employee)
 def show(portal):
-  print("Show " + portal)
+  if portal == "company":
+    print("\n\n\nEnter the Company's ID")
+    company_id = input("> ")
+
+    result = cursor.execute(
+      "SELECT * FROM companies WHERE id = ?", 
+      [company_id]
+    )
+    print(result.fetchone())
+    companiesPortal()
+
+  if portal == "employee":
+    print("\n\n\nEnter the Employee's ID")
+    employee_id = input("> ")
+
+    result = cursor.execute(
+      "SELECT * FROM employees WHERE id = ?",
+      [employee_id]
+    )
+    print(result.fetchone())
+    employeesPortal()
+
 
 
 # Create a new entry
@@ -46,7 +73,7 @@ def show(portal):
 def create(portal):
   # In the company Portal
   if portal == "company":
-    print("Creating a new company.")
+    print("\n\n\nCreating a new company.")
     print("Please insert the company's name:")
     name = input("> ")
     # Created a new company with the user inputted name
@@ -55,17 +82,18 @@ def create(portal):
       [name]
     )
     connection.commit()
+    companiesPortal()
 
   # In the employee portal
   if portal == "employee":
-    print("Creating a new employee.")
+    print("\n\n\nCreating a new employee.")
     print("Please insert the employee's full name:")
     name = input("> ") # Collect the employee's name
 
     # Function calls to find / create a company to link the employee too.
     ## Returns the company as a tuple
     def employerFinder():
-      print("Where does the employee work?")
+      print("\nWhere does the employee work?")
       print("Please choose one of the following:")
       print("1. Search for Existing Companies")
       print("2. Create a new Company")
@@ -78,7 +106,7 @@ def create(portal):
       if selection == "1" or selection == "search" or selection == "Search":
         # Function to find existing companies
         def employerSearch():
-          print("Input the company's name:")
+          print("\nInput the company's name:")
           searchName = input("> ") ## The company name being queried for
           searchResults = cursor.execute( ## Returns all companies under that name (can be many, one, or none)
             "SELECT * FROM companies WHERE name = ?",
@@ -95,7 +123,7 @@ def create(portal):
           ## 1 company was found with that name.
           ### Simple Yes/No to confirm
           elif len(allResults) == 1:
-            print("The following company was found:")
+            print("\nThe following company was found:")
             print(allResults)
             print("Is this the correct company?")
             print("1. Yes")
@@ -115,7 +143,7 @@ def create(portal):
           else:
             # Function to allow the user to select one of the many companies.
             def multiCompanySelection():
-              print("The following companies were found:")
+              print("\nThe following companies were found:")
               ## Loop through each search result found, so the user can see the options.
               for index, result in range(len(searchResults)):
                 print(f"{index+1}.")
@@ -155,7 +183,7 @@ def create(portal):
       if selection == "2" or selection == "create" or selection == "Create":
         # Function to create a new company
         def createCompany():
-          print("Creating a new Company.")
+          print("\nCreating a new Company.")
           print("Insert the Company's Name:")
           companyName = input("> ")
 
@@ -190,6 +218,7 @@ def create(portal):
       [name, company]
     )
     connection.commit()
+    employeesPortal()
 
 
 # Update specified entry
