@@ -44,42 +44,56 @@ def show(portal):
 # Create a new entry
 ## Portal = DB type (Company / Employee)
 def create(portal):
+  # In the company Portal
   if portal == "company":
     print("Creating a new company.")
     print("Please insert the company's name:")
     name = input("> ")
+    # Created a new company with the user inputted name
     cursor.execute(
       "INSERT INTO companies (name) VALUES (?)",
       [name]
     )
     connection.commit()
 
+  # In the employee portal
   if portal == "employee":
     print("Creating a new employee.")
     print("Please insert the employee's full name:")
-    name = input("> ")
+    name = input("> ") # Collect the employee's name
 
+    # Function calls to find / create a company to link the employee too.
+    ## Returns the company as a tuple
     def employerFinder():
       print("Where does the employee work?")
       print("Please choose one of the following:")
       print("1. Search for Existing Companies")
       print("2. Create a new Company")
-      selection = input("> ")
-
+      # User selects to either:
+      ## search for an existing company
+      ## create a new company
+      selection = input("> ") 
+      
+      # Search for an existing company
       if selection == "1" or selection == "search" or selection == "Search":
+        # Function to find existing companies
         def employerSearch():
           print("Input the company's name:")
-          searchName = input("> ")
-          searchResults = cursor.execute(
+          searchName = input("> ") ## The company name being queried for
+          searchResults = cursor.execute( ## Returns all companies under that name (can be many, one, or none)
             "SELECT * FROM companies WHERE name = ?",
             [searchName]
           )
           allResults = searchResults.fetchall()
+
+          ## No companies were found by that name.
           if len(allResults) == 0:
             print("Could not find " + searchName + ".")
             print("Please try again.")
-            employerSearch()
+            employerSearch() ## Let the user search again
 
+          ## 1 company was found with that name.
+          ### Simple Yes/No to confirm
           elif len(allResults) == 1:
             print("The following company was found:")
             print(allResults)
@@ -87,56 +101,88 @@ def create(portal):
             print("1. Yes")
             print("2. No")
             selection = input("> ")
-            if selection == "1":
-              return allResults[0]
+            if selection == "1" or selection == "Yes" or selection == "yes":
+              # Correct company found.
+              ## Return the found company 
+              ## Since it comes out in a list [()], we need to specify the first element of the list.
+              return allResults[0] 
             else:
+              # Incorrect result
+              ## Send them back to search for a new company.
               employerSearch()
-            
+          
+          # 2 or more companies were found under the specified name.
           else:
+            # Function to allow the user to select one of the many companies.
             def multiCompanySelection():
               print("The following companies were found:")
+              ## Loop through each search result found, so the user can see the options.
               for index, result in range(len(searchResults)):
                 print(f"{index+1}.")
                 print(searchResults[result])
               print(f"{len(searchResults)+2}. None of the above")
-
               selection = input("> ")
+
+              # The user selects a number within the scope of the search results
+              ## Return the SINGLE result based on the user's input
+              ## Based on the index of the list [(X),(),()]
               if int(selection) > 0 and int(selection) <= len(searchResults)+1:
                 return searchResults[int(selection)]
 
+              # The user selected the last option which was "none of the above"
+              ## Let the user input a new company name to search for.
               elif int(selection) == len(searchResults)+2:
                 employerSearch()
 
+              # The user inputed a key that was not valid.
+              ## Make them remake their selection.
               else:
+                print("Invalid selection.")
                 multiCompanySelection()
             
+            # Run function to have the user select A company from the found companies.
             acceptedCompany = multiCompanySelection()
+            ## Only proceed if a company was added. If none were added, then we dont return anything.
             if acceptedCompany:
               return acceptedCompany
 
+        # Allow the user to search for a company.
+        ## Results in a company tuple (ID, NAME)
         company = employerSearch()  
-        return company
+        return company # Returns the selected company to the employee creator's company_id
         
+      # The user chose to Create a new company.
       if selection == "2" or selection == "create" or selection == "Create":
+        # Function to create a new company
         def createCompany():
           print("Creating a new Company.")
           print("Insert the Company's Name:")
           companyName = input("> ")
+
+          ## If the user inputs a valid company name, it creates a new company by that name.
           if companyName:
             cursor.execute(
               "INSERT INTO companies (name) VALUES (?) RETURNING id, name",
               [companyName]
               )
+            # Returns the newly created company, so that it can be used in the employee creation.
             newCompany = cursor.fetchone()
             connection.commit()
+            # Returns the created company
             return newCompany
+          
+          ## The user pressed ENTER without adding any text.
           else:
-            createCompany()
+            createCompany() # Allow the user to try again.
+        
+        # Initates the company creation.
         createdCompany = createCompany()
+        # Returns the company that was created.
         return createdCompany
 
-
-
+    # Gets the company the employee belongs to.
+    ## Returned a tuple containing the company info (ID, name)
+    ## We are only retaining the companyID for our one-to-many relationship.
     company = employerFinder()[0]
     print(company)
     cursor.execute(
