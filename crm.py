@@ -232,7 +232,27 @@ def update(portal):
 ## Delete by: ID
 ## Portal = DB type (Company / Employee)
 def delete(portal):
-  print("Delete " + portal)
+  if portal == "company":
+    print("\n\n\nEnter the Company's ID")
+    company_id = input("> ")
+
+    result = cursor.execute(
+      "DELETE FROM companies WHERE id = ?", 
+      [company_id]
+    )
+    print("Deleted Company")
+    companiesPortal()
+
+  if portal == "employee":
+    print("\n\n\nEnter the Employee's ID")
+    employee_id = input("> ")
+
+    result = cursor.execute(
+      "DELETE FROM employees WHERE id = ?",
+      [employee_id]
+    )
+    print("Deleted Employee")
+    employeesPortal()
 
 
 
