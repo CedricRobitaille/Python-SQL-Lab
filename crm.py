@@ -16,6 +16,40 @@ cursor = connection.cursor()
 # )
 
 
+# View all entries
+## Portal = DB type (Company / Employee)
+def view(portal):
+  print("View " + portal)
+
+
+# View specified entry
+## Search by: ID or Name
+## Portal = DB type (Company / Employee)
+def show(portal):
+  print("Show " + portal)
+
+
+# Create a new entry
+## Portal = DB type (Company / Employee)
+def create(portal):
+  print("Create " + portal)
+
+
+# Update specified entry
+## Search by: ID
+## Portal = DB type (Company / Employee)
+def update(portal):
+  print("Update " + portal)
+
+
+# View specified entry
+## Delete by: ID
+## Portal = DB type (Company / Employee)
+def delete(portal):
+  print("Delete " + portal)
+
+
+
 # Employee Portal to decide on actions for the Company DB
 def companiesPortal():
   print("\n\n\nCompanies Portal")
@@ -29,21 +63,21 @@ def companiesPortal():
 
   selection = input("> ")
   if (selection == "1" or selection == "view"):
-    print("View")
+    view("company")
   elif (selection == "2" or selection == "show"):
-    print("Show")
+    show("company")
   elif (selection == "3" or selection == "create"):
-    print("Create")
+    create("company")
   elif (selection == "4" or selection == "update"):
-    print("Update")
+    update("company")
   elif (selection == "5" or selection == "delete"):
-    print("Delete")
+    delete("company")
   elif (selection == "6" or selection == "back"):
-    print("View")
     root()
   else:
     print("Invalid Selection. Please try again.")
     companiesPortal()
+
 
 
 # Employee Portal to decide on actions for the employee DB
@@ -51,11 +85,13 @@ def employeesPortal():
   print("\n\n\nEmployees Portal")
 
 
+
 # Root Portal to decide between actions.
 def root():
   print("\n\n\nWelcome to your Customer Relationship Management Tool.")
   print("Select the portal you would like to enter:")
-  print("1. Companies\n2. Employees")
+  print("1. Companies")
+  print("2. Employees")
 
   selection = input("> ")
   if selection == "1" or selection == "Companies" or selection == "companies":
@@ -70,12 +106,8 @@ def root():
 
 
 
-
-
-
 # Initial Load 
 root()
-
 
 
 # All actions completes.
