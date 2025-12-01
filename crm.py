@@ -225,7 +225,72 @@ def create(portal):
 ## Search by: ID
 ## Portal = DB type (Company / Employee)
 def update(portal):
-  print("Update " + portal)
+  if portal == "company":
+    def companySelection():
+      print("\n\n\nInput the Company ID for the company you would like to update:")
+      company_id = input("> ")
+
+      results = cursor.execute(
+        "SELECT * FROM companies WHERE id = ?",
+        [company_id]
+      )
+      company = results.fetchone()
+      print("\nWould you like to edit:")
+      print(company)
+      print("1. Yes")
+      print("2. No")
+      selection = input("> ")
+      if selection == "1" or selection == "Yes" or selection == "yes":
+        return company
+      else:
+        return companySelection()
+
+    company = companySelection()[0]
+    print("\nInput a new Company Name:")
+    name = input("> ")
+
+    cursor.execute(
+      "UPDATE companies SET name = ? WHERE id = ?",
+      [name, company]
+    )
+    connection.commit()
+    companiesPortal()
+    
+  
+  if portal == "employee":
+    def employeeSelection():
+      print("\n\n\nInput the Employee ID for the Employee you would like to update:")
+      employee_id = input("> ")
+
+      results = cursor.execute(
+        "SELECT * FROM employees WHERE id = ?",
+        [employee_id]
+      )
+      employee = results.fetchone()
+      print("\nWould you like to edit:")
+      print(employee)
+      print("1. Yes")
+      print("2. No")
+      selection = input("> ")
+      if selection == "1" or selection == "Yes" or selection == "yes":
+        return employee
+      else:
+        return employeeSelection()
+
+    employee = employeeSelection()[0]
+    print("\nInput a new Employee Name:")
+    name = input("> ")
+
+    print("\nInput a new Company ID:")
+    company_id = input("> ")
+
+    cursor.execute(
+      "UPDATE employees SET name = ?, company_id = ? WHERE id = ?",
+      [name, company_id, employee]
+    )
+    connection.commit()
+    employeesPortal()
+
 
 
 # View specified entry
@@ -240,6 +305,7 @@ def delete(portal):
       "DELETE FROM companies WHERE id = ?", 
       [company_id]
     )
+    connection.commit()
     print("Deleted Company")
     companiesPortal()
 
@@ -251,6 +317,7 @@ def delete(portal):
       "DELETE FROM employees WHERE id = ?",
       [employee_id]
     )
+    connection.commit()
     print("Deleted Employee")
     employeesPortal()
 
